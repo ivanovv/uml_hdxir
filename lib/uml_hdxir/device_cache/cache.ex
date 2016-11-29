@@ -1,5 +1,7 @@
 defmodule UmlHdxir.DeviceCache.Cache do
 
+  @moduledoc false
+
   use GenServer
 
   def start_link(opts \\ []) do

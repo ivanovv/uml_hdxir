@@ -38,6 +38,8 @@ defmodule UmlHdxir.Mixfile do
      {:gettext, "~> 0.11"},
      {:exjson, "~> 0.6.0"},
      {:poolboy, "~> 1.5.1"},
+     {:credo, "~> 0.5", only: [:dev, :test]},
+     {:exrm, "~> 1.0.8"},
      {:cowboy, "~> 1.0"}]
   end
 

@@ -3,26 +3,28 @@ defmodule UmlHdxir.Extra do
 
   alias UmlHdxir.Device
   alias UmlHdxir.StringClean
+  alias UmlHdxir.HD.Detector
 
   def enrich_device_info(json, ua_string) do
     if json["Device"]["hd_ops"]["stop_on_detect"] != "1" do
       ua_string = StringClean.extra_clean(ua_string)
-      platform_id = UmlHdxir.HD.Detector.get_platform_by_user_agent(ua_string)
-      platform_json = build_filename("/tmp/hd40store/", platform_id) |> Device.read
+      platform_id = Detector.get_platform_by_user_agent(ua_string)
+      platform_json =  platform_id |> build_filename() |> Device.read()
       json = add_platform_info(json, platform_json)
 
-      browser_id = UmlHdxir.HD.Detector.get_browser_by_user_agent(ua_string)
-      browser_json = build_filename("/tmp/hd40store/", browser_id) |> Device.read
+      browser_id = Detector.get_browser_by_user_agent(ua_string)
+      browser_json = browser_id |> build_filename() |> Device.read()
       add_browser_info(json, browser_json)
     else
       json
     end
   end
 
-  defp build_filename(_, nil), do: nil
+  defp build_filename(nil), do: nil
 
-  defp build_filename(folder, id) do
-    "#{folder}/Extra_#{id}.json"
+  defp build_filename(id) do
+    hd_folder = Application.get_env(:uml_hdxir, :hd_folder)
+    "#{hd_folder}Extra_#{id}.json"
   end
 
   defp add_platform_info(device, specs) do

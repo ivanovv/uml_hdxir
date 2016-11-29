@@ -5,9 +5,10 @@ defmodule UmlHdxir.Device do
   alias UmlHdxir.Extra
   alias UmlHdxir.StringClean
   alias UmlHdxir.DeviceCache.Cache
+  alias UmlHdxir.HD.Detector
 
   def get_device_by_user_agent(ua_string) do
-    id = ua_string |> StringClean.clean |> UmlHdxir.HD.Detector.get_device_by_user_agent
+    id = ua_string |> StringClean.clean |> Detector.get_device_by_user_agent
     reply = read_device_info(id, ua_string)
     {:ok, response} = Poison.encode(reply)
     response
@@ -23,17 +24,21 @@ defmodule UmlHdxir.Device do
     end)
   end
 
-  defp build_filename(_, nil), do: nil
+  defp build_filename(nil), do: nil
 
-  defp build_filename(folder, id) do
-    "#{folder}/Device_#{id}.json"
+  defp build_filename(id) do
+    hd_folder = Application.get_env(:uml_hdxir, :hd_folder)
+    "#{hd_folder}Device_#{id}.json"
   end
 
-  defp read_device_info(nil, _), do: %{ error: true, data: %{status: 0, message: "OK"} }
+  defp read_device_info(nil, _), do: %{error: true, data: %{status: 0, message: "OK"}}
 
   defp read_device_info(id, ua_string) do
-    filename = build_filename("/tmp/hd40store/", id)
-    read(filename) |> Extra.enrich_device_info(ua_string) |> format_response
+    id
+    |> build_filename()
+    |> read()
+    |> Extra.enrich_device_info(ua_string)
+    |> format_response()
   end
 
   defp format_response(json) do

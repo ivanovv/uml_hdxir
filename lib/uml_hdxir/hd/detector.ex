@@ -8,7 +8,8 @@ defmodule UmlHdxir.HD.Detector do
   end
 
   def init(filename) do
-    {:ok, data} = File.read(filename)
+    hd_folder = Application.get_env(:uml_hdxir, :hd_folder)
+    {:ok, data} = File.read("#{hd_folder}#{filename}")
     list = ExJSON.parse(data)
     {:ok, list}
   end
@@ -32,7 +33,6 @@ defmodule UmlHdxir.HD.Detector do
   def get_browser_by_user_agent(user_agent) do
     :poolboy.transaction(:browser_detector, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
   end
-
 
   def handle_call({:match, ua_string}, _from, list) do
     result = Enum.find_value(list, fn t -> find_match(t, ua_string) end)

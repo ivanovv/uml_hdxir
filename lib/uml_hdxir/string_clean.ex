@@ -1,5 +1,7 @@
 defmodule UmlHdxir.StringClean do
 
+  @moduledoc false
+
   def clean(str) do
     str
     |> String.downcase
