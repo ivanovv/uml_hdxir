@@ -11,7 +11,7 @@ defmodule UmlHdxir.DetectController do
     device = Device.get_device_by_user_agent(user_agent)
     conn
     |> put_status(:ok)
-    |> put_resp_header("Content-Type", "application/json")
+    |> put_resp_header("content-type", "application/json")
     |> text(device)
   end
   

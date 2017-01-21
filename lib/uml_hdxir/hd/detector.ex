@@ -19,19 +19,23 @@ defmodule UmlHdxir.HD.Detector do
   def get_device_by_user_agent(nil), do: nil
 
   def get_device_by_user_agent(user_agent) do
-    result = :poolboy.transaction(:device_detector0, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
+    result = match(:device_detector0, user_agent)
     case result do
-      nil -> :poolboy.transaction(:device_detector1, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
+      nil -> match(:device_detector1, user_agent)
       _   -> result
     end
   end
 
   def get_platform_by_user_agent(user_agent) do
-    :poolboy.transaction(:platform_detector, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
+    match(:platform_detector, user_agent)
   end
 
   def get_browser_by_user_agent(user_agent) do
-    :poolboy.transaction(:browser_detector, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
+    match(:browser_detector, user_agent)
+  end
+
+  defp match(user_agent, detector) do
+    :poolboy.transaction(detector, fn(pid) -> GenServer.call(pid, {:match, user_agent}) end, :infinity)
   end
 
   def handle_call({:match, ua_string}, _from, list) do
